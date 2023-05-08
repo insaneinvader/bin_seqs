@@ -1,0 +1,14 @@
+# OS
+Thumbs.db
+desktop.ini
+.fuse_hidden*
+.DS_Store
+._*
+
+# VSCode
+.vscode/
+
+# Python
+__pycache__/
+.venv/
+venv/

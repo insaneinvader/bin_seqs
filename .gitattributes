@@ -1,0 +1,6 @@
+# Default
+* text=auto
+
+# Python
+*.py text eol=lf
+*.pyw text eol=lf
