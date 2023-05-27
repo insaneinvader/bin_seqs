@@ -26,7 +26,7 @@ parser.add_argument(
         "-l", "--word-len", metavar="L", type=int, default=8, help=
         "word length (number of bits in each word)")
 parser.add_argument(
-        "-t", "--mls-taps", metavar="T", default=None, type=any_int_fmt, help=
+        "-t", "--mls-taps", metavar="T", type=any_int_fmt, default=None, help=
         "taps for LFSR used to generate MLS sequence")
 args = parser.parse_args()
 
@@ -51,9 +51,11 @@ seqs = (
     (MLSGen(args.word_len, args.gen_bits, args.mls_taps), "b", "MLS"),
 )
 
+px = 1 / plt.rcParams['figure.dpi']
 fig, ax = plt.subplots(len(seqs) + 1, 1, constrained_layout=True,
-        gridspec_kw={"height_ratios": [1] * len(seqs) + [len(seqs)]})
-one_pix = 72.0 / fig.dpi
+        gridspec_kw={"height_ratios": [1] * len(seqs) + [len(seqs)]},
+        figsize=(1280*px, 896*px)) # This is a nice size for FHD and A4
+px = 72 / fig.dpi
 seq_axs = ax[0:-1]
 fft_ax = ax[-1]
 
@@ -64,11 +66,11 @@ for seq_ax, (seq, color, label) in zip(seq_axs, seqs):
     # Draw signal values (words or bits)
     x = np.arange(len(seq))
     y = np.fromiter(seq, DTYPE, len(seq))
-    seq_ax.step(x, y, f"-{color}", where="mid", label=label, linewidth=one_pix)
+    seq_ax.step(x, y, f"-{color}", where="mid", label=label, linewidth=px)
     # Group bits into words
     if args.gen_bits:
         for x_div in range(0, MAX_DATA_NUM + 1, args.word_len):
-            seq_ax.axvline(x_div - 0.5, color="k", linewidth=one_pix)
+            seq_ax.axvline(x_div - 0.5, color="k", linewidth=px)
     # Axis config
     seq_ax.set_ylabel("Value")
     seq_ax.set_xlim(0, MAX_DATA_NUM - 1)
@@ -79,7 +81,7 @@ for seq_ax, (seq, color, label) in zip(seq_axs, seqs):
     prev_seq_ax = seq_ax
     # Draw signal harmonics
     mags = get_fft_mags(y - y.mean()) # Remove offset
-    fft_ax.plot(mags, color, label=label, linewidth=one_pix)
+    fft_ax.plot(mags, color, label=label, linewidth=px)
 
 fft_ax.set_title("FFT")
 fft_ax.set_ylabel("Amplitude (offset removed)")
@@ -89,4 +91,10 @@ fft_ax.grid(which="major", color="#DDDDDD")
 fft_ax.grid(which="minor", color="#EEEEEE")
 fft_ax.minorticks_on()
 
-plt.show()
+# https://matplotlib.org/stable/users/explain/backends.html#selecting-a-backend
+if plt.rcParams["backend"] == "agg":
+    # Save if the system is headless
+    plt.savefig("seqs.pdf")
+else:
+    # Show if a display is available
+    plt.show()

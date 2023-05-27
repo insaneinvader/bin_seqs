@@ -12,3 +12,6 @@ desktop.ini
 __pycache__/
 .venv/
 venv/
+
+# Misc
+seqs.pdf
