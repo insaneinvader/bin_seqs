@@ -29,6 +29,8 @@ parser.add_argument(
         "-t", "--mls-taps", metavar="T", type=any_int_fmt, default=None, help=
         "taps for LFSR used to generate MLS sequence")
 args = parser.parse_args()
+# Or show help if there are no args https://stackoverflow.com/a/47440202/7547272
+#args = parser.parse_args(sys.argv[1:] or ["-h"])
 
 if args.gen_bits:
     DTYPE = np.bool8
